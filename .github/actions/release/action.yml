@@ -37,6 +37,22 @@ runs:
       run: pnpm submodules:load
       shell: bash
 
+    - name: Conventional changelog Action
+      id: changelog
+      users: TriPSs/conventional-changelog-action@v3.19.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: create release
+      uses: actions/create-release@v1
+      if: ${{ steps.changelog.outputs.skipped == 'false' }}
+      env: 
+        GITHUB_TOKEN: ${{ secrets.CHANGELOG_RELEASE }}
+      with:
+        tag_name: ${{ steps.changelog.outputs.tag }}
+        release_name: ${{ steps.changelog.outputs.tag }}
+        body: ${{ steps.changelog.outputs.clean_changelog }}
+
     - name: Populate prerequisities
       run: |
         echo "{\"release_tag\":\"$TAG\"}" > cache-control.json
