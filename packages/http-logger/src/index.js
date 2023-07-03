@@ -1,6 +1,7 @@
 import { moduleLogger } from "@sliit-foss/module-logger";
 
 const logger = moduleLogger("framework");
+console.log("logger", logger);
 
 const defaultProperties = ["path", "method", "query", "params"];
 
