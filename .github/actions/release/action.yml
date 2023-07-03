@@ -47,7 +47,7 @@ runs:
       id: changelog
       uses: TriPSs/conventional-changelog-action@v3.19.0
       with:
-        github_token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.github_token }}
       
     - name: create release
       uses: actions/create-release@v1
