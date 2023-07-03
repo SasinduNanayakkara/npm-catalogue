@@ -40,12 +40,14 @@ runs:
     - name: Conventional changelog Action
       id: changelog
       uses: TriPSs/conventional-changelog-action@v3.19.0
-      
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
       
     - name: create release
       uses: actions/create-release@v1
       if: ${{ steps.changelog.outputs.skipped == 'false' }}
-      
+      env: 
+        GITHUB_TOKEN: ${{ secrets.CHANGELOG_RELEASE }}
       with:
         tag_name: ${{ steps.changelog.outputs.tag }}
         release_name: ${{ steps.changelog.outputs.tag }}
@@ -61,9 +63,19 @@ runs:
         done
       shell: bash
 
-    
+    - name: Publish packages on NPM
+      run: |
+        pnpm --filter @sliit-foss/automatic-versioning build && npm i -g ./packages/automatic-versioning
+        pnpm release
+      shell: bash
 
     - name: Cleanup
       run: rm -rf cache-control.json && rm -rf p*/**/cache-control.json
       shell: bash
 
+    - name: Update release info
+      run: |
+        git config pull.ff true
+        git add . && git commit -m "CI: @sliit-foss/automatic-versioning - sync release" || true
+        git pull --rebase && git push origin
+      shell: bash
